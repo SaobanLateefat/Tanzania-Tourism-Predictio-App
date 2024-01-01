@@ -1,1 +1,1 @@
-# Tanzania-Tourism-Predictio-App
+# Tanzania-Tourism-Prediction-App
