@@ -1,0 +1,141 @@
+import pandas as pd
+import numpy as np
+import streamlit as st
+import joblib
+
+# Load the model using joblib
+loaded_model = joblib.load('b_classifier.joblib')
+
+# Mapping dictionaries for categorical variables
+categorical_mappings = {
+    'travel_with': {
+        'Friends / Relatives': 0,
+        'Alone': 1,
+        'Spouse': 2,
+        'Children': 3,
+        'Other': 4
+    },
+    'purpose': {
+        'Leisure and Holidays': 0,
+        'Visiting Friends and Relatives': 1,
+        'Business': 2,
+        'Meetings and Conference': 3,
+        'Volunteering': 4,
+        'Scientific and Academic': 5,
+        'Other': 6
+    },
+    'main_activity': {
+        'Wildlife tourism': 0,
+        'Cultural tourism': 1,
+        'Mountain climbing': 2,
+        'Beach tourism': 3,
+        'Conference tourism': 4,
+        'Hunting tourism': 5,
+        'Bird watching': 6,
+        'business': 7,
+        'Other': 8
+    },
+    'info_source': {
+        'Friends, relatives': 0,
+        'others': 1,
+        'Travel, agent, tour operator': 2,
+        'Radio, TV, Web': 3,
+        'Tanzania Mission Abroad': 4,
+        'inflight magazines': 5,
+        'Newspaper, magazines, brochures': 6,
+        'Other': 7
+    },
+    'tour_arrangement': {
+        'Independent': 0,
+        'Other': 1
+    },
+    'package_transport_int': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_accomodation': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_food': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_transport_tz': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_sightseeing': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_guided_tour': {
+        'No': 0,
+        'Yes': 1
+    },
+    'package_insurance': {
+        'No': 0,
+        'Yes': 1
+    },
+    'payment_mode': {
+        'Cash': 0,
+        'Credit Card': 1,
+        'Other': 2,
+        'Online Purchase': 3
+    },
+    'first_trip_tz': {
+        'No': 0,
+        'Yes': 1
+    },
+    'most_impressing': {
+        'Friendly People': 0,
+        'Wonderful Country, Landscape, Nature': 1,
+        'Excellent Experience': 2,
+        'No comments': 3,
+        'Wildlife': 4,
+        'No most impression': 5,
+        'Good service': 6,
+        'Other': 7
+    },
+    'Continent': {
+        'Europe': 0,
+        'Asia': 1,
+        'Africa': 2,
+        'North America': 3,
+        'South America': 4,
+        'Other': 5
+    }
+}
+
+# Streamlit Input Form
+st.title('Tanzania Tourism Price Prediction')
+st.sidebar.header("Enter User Inputs")
+
+# Create input fields for each feature
+input_data = {}
+
+for feature, mappings in categorical_mappings.items():
+    input_data[feature] = st.sidebar.selectbox(feature, list(mappings.keys()))
+
+# Numeric inputs
+input_data['total_people'] = st.sidebar.number_input("Total People", min_value=1)
+input_data['total_night_spent'] = st.sidebar.number_input("Total Night Spent", min_value=0)
+input_data['mgf2'] = st.sidebar.number_input("mgf2", min_value=0)
+input_data['mgf3'] = st.sidebar.number_input("mgf3", min_value=0)
+input_data['mgf4'] = st.sidebar.number_input("mgf4", min_value=0)
+input_data['mf1'] = st.sidebar.number_input("mf1", min_value=0)
+
+# Prediction button
+if st.sidebar.button("Predict"):
+    # Map categorical inputs to numerical values
+    for feature in categorical_mappings.keys():
+        input_data[feature] = categorical_mappings[feature][input_data[feature]]
+
+    # Create a DataFrame from the input data
+    input_df = pd.DataFrame([input_data])
+
+    # Use your loaded model to make predictions
+    prediction = loaded_model.predict(input_df)
+
+    # Display the prediction result
+    st.write(f"Predicted Total Cost: ${prediction[0]:.2f}")
